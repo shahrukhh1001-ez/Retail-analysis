@@ -1,0 +1,461 @@
+CREATE DATABASE RetailAnalyticsDB;
+
+USE RetailAnalyticsDB;
+
+CREATE TABLE items
+(
+item_id INT PRIMARY KEY AUTO_INCREMENT,
+
+item_name VARCHAR(100),
+
+category VARCHAR(50),
+
+brand VARCHAR(50),
+
+purchase_price DECIMAL(10,2),
+
+selling_price DECIMAL(10,2),
+
+stock_quantity INT,
+
+supplier_name VARCHAR(100)
+);
+
+
+INSERT INTO items
+(item_name,category,brand,purchase_price,selling_price,stock_quantity,supplier_name)
+
+VALUES
+
+('Laptop','Electronics','HP',45000,52000,40,'ABC Traders'),
+
+('Mobile','Electronics','Samsung',18000,22000,80,'XYZ Electronics'),
+
+('Refrigerator','Electronics','LG',28000,34000,25,'Cool Appliances'),
+
+('Office Chair','Furniture','Nilkamal',2200,3500,100,'Furniture World'),
+
+('Dining Table','Furniture','Godrej',12000,17000,30,'Furniture World'),
+
+('Rice 10kg','Grocery','India Gate',700,900,250,'Fresh Foods'),
+
+('Cooking Oil','Grocery','Fortune',120,170,300,'Fresh Foods'),
+
+('T-Shirt','Clothing','Levis',500,900,150,'Fashion Hub');
+
+
+CREATE TABLE orders
+(
+order_id INT PRIMARY KEY AUTO_INCREMENT,
+
+order_date DATE,
+
+customer_name VARCHAR(100),
+
+city VARCHAR(50),
+
+payment_mode VARCHAR(30),
+
+quantity INT,
+
+item_id INT,
+
+FOREIGN KEY(item_id)
+REFERENCES items(item_id)
+);
+
+
+INSERT INTO orders
+(order_date,customer_name,city,payment_mode,quantity,item_id)
+
+VALUES
+
+('2026-01-02','Rahul','Delhi','UPI',2,2),
+
+('2026-01-03','Priya','Noida','Cash',1,1),
+
+('2026-01-05','Amit','Delhi','Card',3,6),
+
+('2026-01-07','Neha','Mumbai','UPI',1,3),
+
+('2026-01-09','Rohit','Pune','Card',2,4),
+
+('2026-01-10','Pooja','Delhi','Cash',5,7),
+
+('2026-01-12','Ankit','Jaipur','UPI',2,8),
+
+('2026-01-14','Komal','Delhi','Card',1,5),
+
+('2026-01-16','Mohit','Noida','UPI',2,2),
+
+('2026-01-18','Nisha','Lucknow','Cash',1,1);
+
+
+
+##1.Display all items.
+Select *
+from items;
+
+##2.Display all orders.
+Select *
+from orders;
+
+##3.Show Electronics products.
+select *
+from items
+where category ='electronics';
+
+##4.Display orders from Delhi.
+select *
+from orders
+where city = 'Delhi';
+
+##5.Show products with stock greater than 100.
+
+select *
+from items
+where stock_quantity > 100;
+
+##6.Display orders paid using UPI.
+
+select *
+from orders
+where payment_mode = 'UPI';
+
+##7.Display products costing more than ₹20,000.
+
+select *
+from items
+where purchase_price > 20000;
+
+
+##8.Display unique cities.
+
+select distinct(city)
+from orders;
+
+
+##9.Sort items by selling price.
+
+select*
+from items
+order by selling_price;
+
+
+##10.Display top 5 expensive products.
+
+select*
+from items
+order by selling_price desc
+limit 5;
+
+
+##11. Display customer name, item name and quantity.
+select o.customer_name,i.item_name,o.quantity
+from orders as o inner join items AS i
+on o.item_id = i.item_id;
+
+##12. Display category and customer name.
+
+select category,customer_name
+from orders as o inner join items as i
+on o.item_id = i.item_id;
+
+
+##. Display brand and quantity sold.
+select i.brand,o.quantity
+from orders as o inner join items as i
+on o.item_id = i.item_id;
+
+##14. Display selling price with customer.
+
+select customer_name,selling_price
+from orders as o inner join items as i
+on o.item_id = i.item_id;
+
+##15. Display supplier name with customer.
+
+select supplier_name,customer_name
+from orders as o inner join items as i
+on o.item_id = i.item_id;
+
+
+##16.Product-wise quantity sold.
+
+select item_name,sum(quantity)
+from orders as o inner join items as i
+on o.item_id = i.item_id
+group by item_name;
+
+
+##17.Category-wise sales quantity.
+
+select i.category,sum(quantity)
+from orders as o inner join items as i
+on o.item_id = i.item_id
+group by category;
+
+##18.Brand-wise quantity sold.
+select brand, sum(order_id)
+from orders as o inner join items as i
+on o.item_id = i.item_id
+group by brand;
+
+
+##19.Supplier-wise sales.
+
+select supplier_name, sum(selling_price)
+from orders as o inner join items as i
+on o.item_id = i.item_id
+group by supplier_name;
+
+
+##20.City-wise orders.
+
+select city, count(*) as total_orders
+from orders as o inner join items as i
+on o.item_id = i.item_id
+group by city;
+
+
+##21.Payment mode analysis.
+
+Select payment_mode,count(*) as total_payment
+from orders as o inner join items as i
+on o.item_id = i.item_id
+group by payment_mode;
+
+
+##22.Number of orders per product.
+select item_name, count(*) as total_order
+from orders as o inner join items as i
+on o.item_id = i.item_id
+group by item_name;
+
+
+##23.Category-wise products.
+Select category, count(distinct item_name) as total_product
+from orders as o inner join items as i
+on o.item_id = i.item_id
+group by category;
+
+
+##24.Brand-wise products.
+Select brand, count(distinct item_name) as total_product
+from orders as o inner join items as i
+on o.item_id = i.item_id
+group by brand;
+
+
+##25.Supplier-wise products.
+Select Supplier_name, count(distinct item_name) as total_product
+from orders as o inner join items as i
+on o.item_id = i.item_id
+group by Supplier_name;
+
+
+##26.Most sold product.
+select item_name,sum(quantity) as best_seller
+from orders as o inner join items as i
+on o.item_id = i.item_id
+group by item_name
+order by best_seller desc
+limit 1;
+
+
+##27.Least sold product.
+select item_name,sum(quantity) as least_sold
+from orders as o inner join items as i
+on o.item_id = i.item_id
+group by item_name
+order by least_sold 
+limit 1;
+
+
+##28.Highest selling price product.
+select item_name, max(selling_price) as sale_topper
+from orders as o inner join items as i
+on o.item_id = i.item_id
+group by item_name
+order by sale_topper desc 
+limit 1;
+
+
+##29.Lowest selling price product.
+select item_name, min(selling_price) as least_price
+from orders as o inner join items as i
+on o.item_id = i.item_id
+group by item_name
+order by least_price 
+limit 1;
+
+
+##30.Average selling price.
+select item_name, avg(selling_price) as average_price
+from orders as o inner join items as i
+on o.item_id = i.item_id
+group by item_name;
+
+
+##31.Total stock available.
+select sum(stock_quantity) as total_stock
+from items;
+
+
+##32. Total Quantity Sold
+select sum(quantity) as total_quantity
+from orders;
+
+
+##33. Total Number of Products
+select count(distinct item_name)
+from items;
+
+
+##34. Total Number of Orders
+select count(*) as total_orders
+from orders;
+
+
+##35. Average Order Quantity
+select avg(quantity) as avg_q
+from orders;
+
+
+####Business Analytics Queries
+##36. Which Category is Most Popular?
+select category, sum(quantity) Most_popular
+from orders as o 
+inner join items as i
+on o.item_id = i.item_id
+group by category
+order by Most_popular desc
+limit 1;
+
+
+##37. Which City Places the Most Orders?
+select city, count(*) Most_orders
+from orders as o 
+inner join items as i
+on o.item_id = i.item_id
+group by city
+order by Most_orders desc
+limit 1;
+
+
+##38. Which Supplier's Products Sell the Most?
+select supplier_name, sum(quantity) as superstar
+from orders as o 
+inner join items as i
+on o.item_id = i.item_id
+group by supplier_name
+order by superstar desc
+limit 1;
+
+
+##39. Which Payment Mode is Most Used?
+select payment_mode, count(*) as most_used
+from orders as o 
+inner join items as i
+on o.item_id = i.item_id
+group by payment_mode
+order by most_used desc
+limit 1;
+
+
+##40. Which Product Has Never Been Ordered?
+select item_name
+from items as i
+left join orders as o
+on o.item_id = i.item_id
+where o.order_id is null;
+
+
+##41. Products Having Low Stock (Less than 20)
+select * from items
+where stock_quantity < 20;
+
+
+##42. Customers Who Bought Electronics
+select distinct customer_name,category 
+from orders as o
+inner join items as i
+on o.item_id = i.item_id
+where category = "electronics";
+
+
+##43. Customers Who Bought Furniture
+select distinct customer_name,category 
+from orders as o
+inner join items as i
+on o.item_id = i.item_id
+where category = "Furniture";
+
+
+##44. Brand Generating Highest Sales Quantity
+select brand, sum(quantity) as highest_sold
+from orders as o
+inner join items as i
+on o.item_id = i.item_id
+group by brand
+order by highest_sold desc
+limit 1;
+
+
+##45. Product Having Highest Stock
+select item_name, stock_quantity as highest_stock
+from items
+order by highest_stock desc
+limit 1;
+
+
+##46. Product Having Lowest Stock
+select item_name,stock_quantity
+from items
+order by stock_quantity asc
+limit 1;
+
+
+##47. Which City Purchased the Highest Quantity?
+select city,sum(stock_quantity) as high
+from orders as o inner join items as i
+on o.item_id = i.item_id
+group by city
+order by high desc
+limit 1;
+
+
+##48. Supplier Having Maximum Products
+select supplier_name,count(*) as max_pro
+from items
+group by supplier_name
+order by max_pro desc
+limit 1;
+
+
+##49. Which Product Category Should Be Restocked First?
+select category,sum(stock_quantity) as urgent_restock
+from items
+group by category
+order by urgent_restock
+limit 1
+
+
+
+##50. Business KPI Dashboard
+select
+
+COUNT(DISTINCT item_id) AS Total_Products,
+
+(SELECT COUNT(*) FROM orders) AS Total_Orders,
+
+(SELECT SUM(quantity) FROM orders) AS Total_Quantity_Sold,
+
+SUM(stock_quantity) AS Total_Stock,
+
+ROUND(AVG(selling_price),2) AS Average_Selling_Price
+
+FROM items;
+
+
+
